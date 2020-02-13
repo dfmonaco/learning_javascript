@@ -1,0 +1,182 @@
+<html>
+  <head>
+    <title>Redux app</title>
+  </head>
+
+  <body>
+    <div>
+      <h1>Numbers</h1>
+      <input id="number" type="text" placeholder="Add Number">
+      <button id="numberButton">Add Number</button>
+      <ul id="numbers"></ul>
+    </div>
+    <div>
+      <h1>Strings</h1>
+      <input id="string" type="text" placeholder="Add String">
+      <button id="stringButton">Add String</button>
+      <ul id="strings"></ul>
+    </div>
+
+    <script type="text/javascript">
+      function createStore(reducer) {
+        // 1. Keep State
+        // 2. Get State (getState)
+        // 3. Subscribe to State changes by adding listeners (subscribe)
+        // 4. Update State (dispatch)
+
+        let state;
+        let listeners = [];
+
+        const getState = () => state;
+
+        const subscribe = (listener) => {
+          listeners.push(listener);
+          return () => {
+            listeners = listeners.filter((l) => l !== listener);
+          };
+        };
+
+        const dispatch = (action) => {
+          state = reducer(state, action);
+          listeners.forEach((listener) => listener());
+        };
+
+        return {
+          getState,
+          subscribe,
+          dispatch,
+        };
+      }
+
+      // ACTIONS AND REDUCERS ARE APP CODE
+
+      // ACTIONS
+      //
+      const ADD_NUMBER = 'ADD_NUMBER';
+      const REMOVE_NUMBER = 'REMOVE_NUMBER';
+      const ADD_STRING = 'ADD_STRING';
+      const REMOVE_STRING = 'REMOVE_STRING';
+
+      const addNumberAction = (number) => (
+        {
+          type: ADD_NUMBER,
+          number,
+        }
+      );
+
+      const removeNumberAction = (number) => (
+        {
+          type: REMOVE_NUMBER,
+          number,
+        }
+      );
+
+      const addStringAction = (string) => (
+        {
+          type: ADD_STRING,
+          string,
+        }
+      );
+
+      const removeStringAction = (string) => (
+        {
+          type: REMOVE_STRING,
+          string,
+        }
+      );
+
+      // REDUCERS
+      // the reducer reduces the current state and an action to a new state
+      // it must be a pure function:
+      // 1. Always returns the same result given the same arguments
+      // 2. Only depend on the arguments passed into them, not on global variables
+      // 3. Never produce any side effects.
+      //
+      const numbersReducer = (state = [], action) => {
+        switch (action.type) {
+          case ADD_NUMBER:
+            return state.concat([action.number]);
+          case REMOVE_NUMBER:
+            return state.filter((number) => number !== action.number);
+          default:
+            return state;
+        }
+      };
+
+      const stringsReducer = (state = [], action) => {
+        switch (action.type) {
+          case ADD_STRING:
+            return state.concat([action.string]);
+          case REMOVE_STRING:
+            return state.filter((string) => string !== action.string);
+          default:
+            return state;
+        }
+      };
+
+      const appReducer = (state = {}, action) => (
+        {
+          numbers: numbersReducer(state.numbers, action),
+          strings: stringsReducer(state.strings, action),
+        }
+      );
+
+      const store = createStore(appReducer);
+
+      // DOM code
+      function addNumber () {
+        const input = document.getElementById('number');
+        const number = input.value;
+        input.value = '';
+
+        store.dispatch(addNumberAction(number));
+      }
+
+      function addString () {
+        const input = document.getElementById('string');
+        const string = input.value;
+        input.value = '';
+
+        store.dispatch(addStringAction(string));
+      }
+
+      document.getElementById('numberButton').
+        addEventListener('click', addNumber);
+
+      document.getElementById('stringButton').
+        addEventListener('click', addString);
+
+      store.subscribe(() => {
+        const { numbers, strings } = store.getState();
+
+        updateList(numbers, 'numbers');
+        updateList(strings, 'strings');
+      })
+
+      function updateList (items, itemType) {
+        const ul = document.getElementById(itemType)
+        ul.innerHTML = '';
+
+        items.forEach(item => {
+          let li = ul.appendChild(document.createElement('li'))
+          li.innerHTML = item;
+          li.appendChild(deleteButton(item, itemType));
+        })
+      }
+
+      function deleteButton (item, itemType) {
+        const action = itemType === 'numbers' ? removeNumberAction : removeStringAction;
+        const button = document.createElement('button');
+        button.innerHTML = 'x';
+
+        button.addEventListener('click', ()=> {
+          store.dispatch(action(item));
+        })
+
+        return button;
+      }
+
+    </script>
+  </body>
+</html>
+

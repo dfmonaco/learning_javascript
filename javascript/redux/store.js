@@ -32,6 +32,7 @@ function createStore(reducer) {
 // ACTIONS AND REDUCERS ARE APP CODE
 
 // ACTIONS
+// the only way to change state is by dispatching a predefined action
 //
 const ADD_NUMBER = 'ADD_NUMBER';
 const REMOVE_NUMBER = 'REMOVE_NUMBER';
@@ -73,6 +74,8 @@ const removeString = (string) => (
 // 2. Only depend on the arguments passed into them, not on global variables
 // 3. Never produce any side effects.
 //
+// filter() and concat() always return a new object
+//
 const numbersReducer = (state = [], action) => {
   switch (action.type) {
     case ADD_NUMBER:
@@ -94,6 +97,8 @@ const stringsReducer = (state = [], action) => {
       return state;
   }
 };
+
+// this is what Redux.combineReducers does:
 
 const appReducer = (state = {}, action) => (
   {
