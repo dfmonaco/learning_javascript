@@ -1,9 +1,9 @@
 // CREATESTORE IS THE LIBRARY CODE
 function createStore(reducer) {
   // 1. Keep State
-  // 2. Get State
-  // 3. Subscribe to State changes (listeners)
-  // 4. Update State
+  // 2. Get State (getState)
+  // 3. Subscribe to State changes by adding listeners (subscribe)
+  // 4. Update State (dispatch)
 
   let state;
   let listeners = [];
@@ -19,7 +19,7 @@ function createStore(reducer) {
 
   const dispatch = (action) => {
     state = reducer(state, action);
-    listeners.forEach((listener) => listener(state));
+    listeners.forEach((listener) => listener());
   };
 
   return {
@@ -106,10 +106,8 @@ const appReducer = (state = {}, action) => (
 
 const store = createStore(appReducer);
 
-console.log(store.getState());
-
-store.subscribe((state) => { console.log('SUBSCRIBER 1:\n'+JSON.stringify(state, null, 4)); });
-store.subscribe((state) => { console.log('SUBSCRIBER 2:\n'+JSON.stringify(state, null, 4)); });
+store.subscribe(() => { console.log('SUBSCRIBER 1:\n'+JSON.stringify(store.getState(), null, 4)); });
+store.subscribe(() => { console.log('SUBSCRIBER 2:\n'+JSON.stringify(store.getState(), null, 4)); });
 
 store.dispatch(addNumber(3));
 store.dispatch(addNumber(8));
