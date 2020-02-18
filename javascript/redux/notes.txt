@@ -1,0 +1,11 @@
+Redux State Shape:
+
+1.- Easy to derive the UI from the redux store state.
+2.- Easy to update the the redux store state.
+
+=>
+  * Never duplicate data -> normalization, use ids to reference data.
+  * Make data as shallow as possible, don't nest too much.
+
+
+
